@@ -18,6 +18,7 @@
     "dev": "micro-dev"
   },
   "dependencies": {
+    "ecdsa-secp256r1": "^1.2.1",
     "micro": "^9.3.2"
   },
   "devDependencies": {
