@@ -1,0 +1,16 @@
+{
+  "name": "centralized-crypto-coin",
+  "version": "0.0.1",
+  "description": "Centralized crypto coin to create a virtual currency",
+  "main": "src/index.js",
+  "repository": "https://github.com/forevertz/centralized-crypto-coin",
+  "author": "Improvertz",
+  "license": "MIT",
+  "keywords": [
+    "centralized",
+    "crypto",
+    "coin",
+    "token",
+    "ecdsa"
+  ]
+}
