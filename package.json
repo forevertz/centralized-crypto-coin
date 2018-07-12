@@ -12,5 +12,10 @@
     "coin",
     "token",
     "ecdsa"
-  ]
+  ],
+  "devDependencies": {
+    "eslint-config-standard": "^11.0.0",
+    "prettier": "^1.13.7",
+    "standard": "^11.0.1"
+  }
 }
