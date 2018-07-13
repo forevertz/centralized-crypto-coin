@@ -2,7 +2,7 @@ const ECDSA = require('ecdsa-secp256r1')
 const { send, text } = require('micro')
 
 const packageInfo = require('../package.json')
-const MAX_CONTENT_LENGTH = 100
+const MAX_CONTENT_LENGTH = 1000
 
 const endpoints = {
   MAX_CONTENT_LENGTH,
@@ -17,12 +17,32 @@ const endpoints = {
     '/time': {
       description: 'Get server time (ISO 8601)',
       call: require('./endpoint/get-time')
+    },
+    '/coins/value': {
+      description: 'Get the value of the given coins',
+      params: [{ name: 'ids', type: 'Array', example: '/coins/value?ids=[1,2,3,4,5]' }],
+      call: require('./endpoint/get-coins-value')
     }
   },
   POST: {
-    '/transfer': {
+    '/coins/transfer': {
       description: 'Transfer the ownership of coins by changing their public key',
-      call: require('./endpoint/post-transfer')
+      params: [
+        {
+          type: 'Array',
+          of: [
+            { name: 'coinId', type: 'int', description: 'Identifier of the coin' },
+            { name: 'timestamp', type: 'int', description: 'Current timestamp in seconds' },
+            {
+              name: 'signature',
+              type: 'string',
+              description: 'BASE64(SIGN(SHA256(coinId-currentPublicKey-timestamp)))'
+            },
+            { name: 'newPublicKey', type: 'string', description: 'New public key to use' }
+          ]
+        }
+      ],
+      call: require('./endpoint/post-coins-transfer')
     }
   }
 }
