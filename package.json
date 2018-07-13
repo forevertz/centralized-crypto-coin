@@ -14,8 +14,9 @@
     "ecdsa"
   ],
   "scripts": {
-    "start": "micro",
-    "dev": "docker-compose -f docker-compose.dev.yml up -d && REDIS=6379 micro-dev -p 3000"
+    "start": "NODE_ENV=${NODE_ENV-production} REDIS=${REDIS-6379} micro",
+    "start:admin": "NODE_ENV=${NODE_ENV-production} REDIS=${REDIS-6379} micro --listen ${ADMIN_URI-tcp://0.0.0.0:3001} src/admin/index.js",
+    "dev": "docker-compose -f docker-compose.dev.yml up -d && micro-dev & micro-dev src/admin/index.js -p 3001"
   },
   "dependencies": {
     "ecdsa-secp256r1": "^1.2.1",

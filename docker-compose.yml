@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:5.0-rc3-alpine
+    command: ["redis-server", "--appendonly yes"]
+    volumes:
+      - dataVolume:/data
+
+  web:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - REDIS=//redis:6379
+    links:
+      - redis
+    command: [ "yarn", "start" ]
+
+  admin:
+    build: .
+    ports:
+      - 3001:3001
+    environment:
+      - REDIS=//redis:6379
+    links:
+      - redis
+    command: [ "yarn", "start:admin" ]
+
+volumes:
+  dataVolume: {}
