@@ -15,11 +15,12 @@
   ],
   "scripts": {
     "start": "micro",
-    "dev": "micro-dev"
+    "dev": "docker-compose -f docker-compose.dev.yml up -d && REDIS=6379 micro-dev -p 3000"
   },
   "dependencies": {
     "ecdsa-secp256r1": "^1.2.1",
-    "micro": "^9.3.2"
+    "micro": "^9.3.2",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "eslint-config-standard": "^11.0.0",

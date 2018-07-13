@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:5.0-rc3-alpine
+    command: ["redis-server", "--appendonly yes"]
+    ports:
+      - 6379:6379
+    volumes:
+      - dataVolume:/data
+
+volumes:
+  dataVolume: {}
