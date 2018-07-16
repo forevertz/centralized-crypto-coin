@@ -1,16 +1,15 @@
 const ECDSA = require('ecdsa-secp256r1')
 
-const { getKeys, lockKeys, updateAll } = require('../service/database')
+const { getKeys, lockKeys, unlockKeys, updateAll } = require('../service/database')
 const { isBase64 } = require('../service/validator')
 
 const COIN_VALUES = [1, 1, 2, 3, 5, 8, 13]
-const MINUTE = 60
 
 function getCoinValue (coinId) {
   return COIN_VALUES[parseInt(coinId) % COIN_VALUES.length]
 }
 
-async function isCoinTransferValid (data) {
+async function isCoinTransferValid (data, expireSeconds) {
   // data should be an array
   if (!Array.isArray(data) || !data.length) {
     return false
@@ -22,7 +21,7 @@ async function isCoinTransferValid (data) {
       return false
     }
     // timestamp is required and should be an integer (timestamp in seconds)
-    const isAlmostNow = value => Math.abs(Date.now() / 1000 - value) < 2 * MINUTE
+    const isAlmostNow = value => Math.abs(Date.now() / 1000 - value) < expireSeconds
     if (timestamp === undefined || !Number.isInteger(timestamp) || !isAlmostNow(timestamp)) {
       return false
     }
@@ -52,14 +51,25 @@ async function isCoinTransferValid (data) {
     return false
   }
 
-  // Obtain lock on coins
+  return true
+}
+
+async function lockCoins (data, expireSeconds) {
   try {
-    await lockKeys(data.map(({ coinId }) => coinId), 2 * MINUTE)
+    await lockKeys(data.map(({ coinId }) => coinId), expireSeconds)
+    return true
   } catch (error) {
     return false
   }
+}
 
-  return true
+async function unlockCoins (data) {
+  try {
+    await unlockKeys(data.map(({ coinId }) => coinId))
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 async function transferCoins (data) {
@@ -74,5 +84,7 @@ async function transferCoins (data) {
 module.exports = {
   getCoinValue,
   isCoinTransferValid,
-  transferCoins
+  lockCoins,
+  transferCoins,
+  unlockCoins
 }
