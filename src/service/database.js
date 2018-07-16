@@ -2,6 +2,12 @@ const redis = require('redis')
 
 const client = redis.createClient(process.env.REDIS)
 
+function get (key) {
+  return new Promise((resolve, reject) => {
+    client.get(key, (error, result) => (error ? reject(error) : resolve(result)))
+  })
+}
+
 function insert (key, value) {
   return new Promise((resolve, reject) => {
     // Set if not exists
@@ -76,6 +82,7 @@ function unlockKeys (keys) {
 
 module.exports = {
   client,
+  get,
   insert,
   update,
   updateAll,
