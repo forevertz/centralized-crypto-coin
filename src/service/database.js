@@ -8,10 +8,10 @@ function get (key) {
   })
 }
 
-function insert (key, value) {
+function insert (key, value, options = []) {
   return new Promise((resolve, reject) => {
     // Set if not exists
-    client.set(key, value, 'NX', (error, result) => {
+    client.set(key, value, 'NX', ...options, (error, result) => {
       error
         ? reject(error)
         : result === null

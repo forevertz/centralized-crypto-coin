@@ -17,7 +17,7 @@ const endpoints = {
       call: require('./endpoint/get-time')
     },
     '/keys/response': {
-      description: 'Get the public response compressed ECDSA public key',
+      description: 'Get the response compressed ECDSA public key',
       call: require('./endpoint/get-keys-response')
     },
     '/coins/value': {

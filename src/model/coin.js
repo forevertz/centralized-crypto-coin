@@ -1,6 +1,7 @@
 const ECDSA = require('ecdsa-secp256r1')
 
 const { getKeys, lockKeys, updateAll } = require('../service/database')
+const { isBase64 } = require('../service/validator')
 
 const COIN_VALUES = [1, 1, 2, 3, 5, 8, 13]
 const MINUTE = 60
@@ -26,7 +27,6 @@ async function isCoinTransferValid (data) {
       return false
     }
     // signature is required and should be a base64 encoded string
-    const isBase64 = value => typeof value === 'string' && /^[A-Za-z0-9+/=]*$/.test(value)
     if (signature === undefined || !isBase64(signature) || signature.length !== 88) {
       return false
     }

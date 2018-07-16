@@ -1,12 +1,15 @@
 const ECDSA = require('ecdsa-secp256r1')
 const { send, text } = require('micro')
 
+const { getPublicControlKey } = require('./model/keys')
+const { ban, isBanned } = require('./service/ban')
+
 async function checkRequest (request, response, endpoints) {
   // Endpoint existance
   if (!endpoints[request.method] || !endpoints[request.method][request.pathname]) {
     return send(response, 404, { success: false, error: 'Not found' })
   }
-  if (request.method === 'POST' || request.method === 'PUT') {
+  if (request.method === 'POST') {
     // Max content length
     const maxContentLength = endpoints.MAX_CONTENT_LENGTH
     const contentLength = parseInt(request.headers['content-length'])
@@ -39,7 +42,7 @@ async function checkRequest (request, response, endpoints) {
       if (!(await key.hashAndVerify(rawBody, signature))) {
         return send(response, 401, {
           success: false,
-          error: 'Header "X-Signature" does not verify (public key, BASE64(SHA256(content)))'
+          error: 'Header "X-Signature" does not verify (public key, BASE64(SIGN(SHA256(content))))'
         })
       }
     } catch (error) {
@@ -53,6 +56,37 @@ async function checkRequest (request, response, endpoints) {
   return true
 }
 
+function getIp (request) {
+  return (
+    request.headers['x-real-ip'] ||
+    request.headers['x-forwarded-for'] ||
+    request.connection.remoteAddress
+  )
+}
+
+async function checkAdminRequest (request, response, endpoints) {
+  if (checkRequest(request, response, endpoints)) {
+    if (request.method === 'POST') {
+      const ip = getIp(request)
+      if (await isBanned(ip)) {
+        return send(response, 401, { success: false, error: 'Banned' })
+      } else {
+        const controlKey = (await getPublicControlKey()).toCompressedPublicKey()
+        if (controlKey !== request.headers['x-public-key']) {
+          const MINUTE = 60
+          await ban(ip, 5 * MINUTE + Math.ceil(Math.random() * 30))
+          return send(response, 401, {
+            success: false,
+            error: 'Header "X-Public-Key" should be the control key'
+          })
+        }
+      }
+    }
+    return true
+  }
+}
+
 module.exports = {
-  checkRequest
+  checkRequest,
+  checkAdminRequest
 }
