@@ -1,7 +1,7 @@
 const { json } = require('micro')
 
 const { isCoinTransferValid, lockCoins, transferCoins, unlockCoins } = require('../model/coin')
-const { getPrivateResponseKey } = require('../model/keys')
+const { signResponse } = require('../model/keys')
 
 const MINUTE = 60
 const EXPIRATION = 2 * MINUTE
@@ -12,9 +12,7 @@ module.exports = async (request, response) => {
     if ((await isCoinTransferValid(data, EXPIRATION)) && (await lockCoins(data, EXPIRATION))) {
       const result = await transferCoins(data)
       await unlockCoins(data)
-      const key = await getPrivateResponseKey()
-      const signature = await key.hashAndSign(result)
-      return { success: true, result, signature }
+      return { success: true, result, signature: await signResponse(result) }
     }
   } catch (error) {
     // TODO: log properly

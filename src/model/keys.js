@@ -11,6 +11,11 @@ async function getPrivateResponseKey () {
   return ECDSA.fromJWK(JSON.parse(await get('keys:response')))
 }
 
+async function signResponse (result) {
+  const key = await getPrivateResponseKey()
+  return key.hashAndSign(result)
+}
+
 async function initKeys () {
   const generateKey = async (keyName, { storePrivateKey }) => {
     const key = ECDSA.generateKey()
@@ -47,5 +52,6 @@ module.exports = {
   setControlKey,
   getPublicControlKey,
   getPrivateResponseKey,
-  isNewPublicControlKeyValid
+  isNewPublicControlKeyValid,
+  signResponse
 }
