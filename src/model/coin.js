@@ -54,22 +54,12 @@ async function isCoinTransferValid (data, expireSeconds) {
   return true
 }
 
-async function lockCoins (data, expireSeconds) {
-  try {
-    await lockKeys(data.map(({ coinId }) => coinId), expireSeconds)
-    return true
-  } catch (error) {
-    return false
-  }
+function lockCoins (data, expireSeconds) {
+  return lockKeys(data.map(({ coinId }) => coinId), expireSeconds)
 }
 
 async function unlockCoins (data) {
-  try {
-    await unlockKeys(data.map(({ coinId }) => coinId))
-    return true
-  } catch (error) {
-    return false
-  }
+  return unlockKeys(data.map(({ coinId }) => coinId))
 }
 
 async function transferCoins (data) {

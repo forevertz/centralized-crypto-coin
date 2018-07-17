@@ -49,22 +49,18 @@ function getKeys (keys) {
 }
 
 function lockKeys (keys, expireSeconds = 60) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     client
       // Set if not exists and expire after X secondes
       .multi(keys.map(key => ['SET', `lock:${key}`, true, 'NX', 'EX', expireSeconds]))
       .exec(async (error, result) => {
         if (error) {
-          reject(error)
+          resolve(false)
         } else if (result.find(res => res === null) !== undefined) {
-          try {
-            await unlockKeys(
-              result.reduce((acc, res, i) => [...acc, ...(res !== null ? [keys[i]] : [])], [])
-            )
-          } catch (error) {
-            // Catch silently, lock whould expire anyway
-          }
-          reject(new Error('one of the keys was already locked'))
+          await unlockKeys(
+            result.reduce((acc, res, i) => [...acc, ...(res !== null ? [keys[i]] : [])], [])
+          )
+          resolve(false)
         } else {
           resolve(true)
         }
@@ -73,9 +69,9 @@ function lockKeys (keys, expireSeconds = 60) {
 }
 
 function unlockKeys (keys) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     client.multi(keys.map(key => ['DEL', `lock:${key}`])).exec((error, result) => {
-      error ? reject(error) : resolve(true)
+      resolve(error === null)
     })
   })
 }
