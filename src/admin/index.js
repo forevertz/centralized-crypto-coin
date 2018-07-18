@@ -1,4 +1,5 @@
 const { checkAdminRequest } = require('../checkRequest')
+const { coinPool } = require('../model/coin')
 const MAX_CONTENT_LENGTH = 100
 
 const endpoints = {
@@ -13,9 +14,15 @@ const endpoints = {
     '/keys/control': {
       description: 'Set new control public key',
       call: require('./endpoint/post-keys-control')
+    },
+    '/coins/create': {
+      description: 'Create new coins',
+      call: require('./endpoint/post-coins-create')
     }
   }
 }
+
+coinPool.replenish()
 
 module.exports = async (request, response) => {
   response.setHeader('Access-Control-Allow-Origin', '*')

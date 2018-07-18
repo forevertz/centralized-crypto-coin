@@ -2,9 +2,19 @@ const redis = require('redis')
 
 const client = redis.createClient(process.env.REDIS)
 
+if (process.env.NODE_ENV === 'development') {
+  client.flushall()
+}
+
 function get (key) {
   return new Promise((resolve, reject) => {
     client.get(key, (error, result) => (error ? reject(error) : resolve(result)))
+  })
+}
+
+function set (key, value) {
+  return new Promise((resolve, reject) => {
+    client.set(key, value, (error, result) => (error ? reject(error) : resolve(result)))
   })
 }
 
@@ -79,6 +89,7 @@ function unlockKeys (keys) {
 module.exports = {
   client,
   get,
+  set,
   insert,
   update,
   updateAll,
