@@ -1,5 +1,7 @@
 const packageInfo = require('../package.json')
 const { checkRequest } = require('./checkRequest')
+
+process.env.TZ = 'UTC'
 const MAX_CONTENT_LENGTH = 1000
 
 const endpoints = {
